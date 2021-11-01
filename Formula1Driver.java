@@ -1,7 +1,7 @@
-import java.util.Comparator;
 
 
-public class Formula1Driver extends Driver implements Comparator<Formula1Driver> {
+
+public class Formula1Driver extends Driver implements Comparable {
 
     private String driverTeam;
     private int totalPoints;
@@ -18,10 +18,6 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
         this.firstPosition = 0;
         this.secondPosition = 0;
         this.thirdPosition = 0;
-    }
-
-    public Formula1Driver(String driverName, String location) {
-        super(driverName, location);
     }
 
     public String getDriverTeam() {
@@ -82,19 +78,6 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
 
     }
 
-
-    public void deleteDriverAndTeam(){
-        this.setDriverTeam("empty");
-        this.setDriverTeam("empty");
-        System.out.println("Deleted successfully");
-    }
-
-    public void UpdateTeamDriver(String name){
-        this.setDriverName(name);
-        System.out.println("Driver updated");
-
-    }
-
     public void addStats(int one,int two, int three, int points,int races){
         this.setFirstPosition(one);
         this.setSecondPosition(two);
@@ -106,14 +89,6 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
 
 
     @Override
-    public int compare(Formula1Driver o1, Formula1Driver o2) {
-
-        int point1 = o1.getTotalPoints();
-        int point2 = o2.getTotalPoints();
-        return point2-point1;
-    }
-
-    @Override
     public String toString() {
         return "Formula1Driver{" +
                 "driverTeam='" + driverTeam + '\'' +
@@ -123,5 +98,12 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
                 ", secondPosition=" + secondPosition +
                 ", thirdPosition=" + thirdPosition +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object obj) {
+        int points = ((Formula1Driver)obj).getTotalPoints();
+        return points-this.totalPoints;
+
     }
 }
