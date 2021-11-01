@@ -1,8 +1,10 @@
 public interface ChampionshipManager {
 
 
-    public default void championshipDriversMain(){
+     default void championshipDriversMain(){
         Formula1ChampionshipManager.championshipDrivers();
-
     }
+
+
+
 }

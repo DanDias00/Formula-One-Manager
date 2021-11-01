@@ -1,110 +1,152 @@
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 
-public class Formula1ChampionshipManager implements ChampionshipManager {
+
+public class Formula1ChampionshipManager implements ChampionshipManager{
     static Scanner sc = new Scanner(System.in);
-    public static Formula1Driver[] champion = new Formula1Driver[10];
+    public static ArrayList<Formula1Driver> champion = new ArrayList<>();
     static int count = 0;
+    Formula1Driver driver;
 
     public static void main(String[] args) {
-
-
-        Formula1Driver driver;
-        initialise();
-
 
         while (true) {
             printMenu();
             String choice = sc.next().toUpperCase();
             switch (choice) {
                 case "A":
-                    for (int i = 0; i < champion.length; i++) {
-                        System.out.println("Enter driver name : ");
-                        String dName = sc.next();
-                        System.out.println("Enter driver team : ");
-                        String dTeam = sc.next();
-                        String state = "yes";
-                        for (int x = 0; x < champion.length; x++) {
-                            if (champion[x].getDriverTeam().equals(dTeam)) {
+                    System.out.println("Enter driver name : ");
+                    String dName = sc.next();
+                    System.out.println("Enter driver team : ");
+                    String dTeam = sc.next();
+                    System.out.println("Enter driver location : ");
+                    String location = sc.next();
+                    String state = "yes";
+                       /* for (int x = 0; x <=champion.size()+1; x++) {
+                            if (champion.get(x).getDriverTeam().equals(dTeam)) {
                                 state = "y";
                                 break;
                             } else {
                                 state = "no";
                             }
-                        }
-                        if (!(state.equals("y"))) {
-                            champion[count].addDriver(dName, dTeam);
-                            count++;
-                            System.out.println("Add another driver? y/n");
-                            String answer = sc.next().toUpperCase();
-                            if (answer.equals("N")) {
-                                break;
-                            }
-                        } else {
-                            System.out.println("Team already there");
-                            break;
-                        }
-
-                    }
+                        }*/
+                    champion.add(new Formula1Driver(dName, dTeam, location));
+                    count++;
                     championshipDrivers();
                     break;
 
                 case "D":
                     System.out.println("Enter Driver name to delete : ");
-                    String dName = sc.next();
+                    String dname = sc.next();
                     System.out.println("Enter Driver team to delete : ");
-                    String dTeam = sc.next();
-                    for (int i = 0; i < champion.length; i++) {
-                        if (champion[i].getDriverName().equals(dName) && (champion[i].getDriverTeam().equals(dTeam))) {
-                            champion[i].deleteDriverAndTeam();
+                    String dteam = sc.next();
+                    String state01 = "yes";
+                    for (int i = 0; i < champion.size(); i++) {
+                        if (champion.get(i).getDriverName().equals(dname) && (champion.get(i).getDriverTeam().equals(dteam))) {
+                            champion.get(i).deleteDriverAndTeam();
+                            state01 = "y";
+
                             break;
 
                         } else {
+                            state01 = "no";
                             continue;
                         }
 
+
+                    }
+                    if (state01.equals("no")) {
+                        System.out.println("No driver found");
+                        break;
                     }
                     championshipDrivers();
                     break;
+
                 case "U":
                     System.out.println("Enter team name to change driver : ");
                     String team = sc.next();
                     System.out.println("Enter new driver name : ");
                     String newName = sc.next();
-                    for (int i = 0; i < champion.length; i++) {
-                        if (champion[i].getDriverTeam().equals(team)) {
-                            champion[i].UpdateTeamDriver(newName);
+                    String state0 = "yes";
+                    for (int i = 0; i < champion.size(); i++) {
+                        if (champion.get(i).getDriverTeam().equals(team)) {
+                            champion.get(i).UpdateTeamDriver(newName);
+                            state0 = "y";
                             break;
                         } else {
+                            state0 = "no";
                             continue;
                         }
+                    }
+                    if (state0.equals("no")) {
+                        System.out.println("No team found");
+                        break;
                     }
                     championshipDrivers();
                     break;
+
                 case "S":
                     System.out.println("Enter driver name to get satistics : ");
                     String statName = sc.next();
-                    String state="yes";
-                    for(int i=0;i<champion.length;i++){
-                        if(champion[i].getDriverName().equals(statName)){
-                            champion[i].statistics();
-                            state="y";
+                    String state1 = "yes";
+                    for (int i = 0; i < champion.size(); i++) {
+                        if (champion.get(i).getDriverName().equals(statName)) {
+                            champion.get(i).statistics();
+                            state1 = "y";
                             break;
-                        }else {
-                            state="no";
+                        } else {
+                            state1 = "no";
                             continue;
                         }
                     }
-                    if(state.equals("no")){
+                    if (state1.equals("no")) {
                         System.out.println("No driver found");
                         break;
                     }
+                    break;
+                case "X":
+                    System.out.println("Enter driver name to add stats : ");
+                    String name = sc.next();
+                    System.out.println("Enter first place positions : ");
+                    int one = sc.nextInt();
+                    System.out.println("Enter second place positions : ");
+                    int two = sc.nextInt();
+                    System.out.println("Enter third place positions : ");
+                    int three = sc.nextInt();
+                    System.out.println("total points : ");
+                    int points = sc.nextInt();
+                    System.out.println("Enter total races : ");
+                    int races = sc.nextInt();
+                    String state2 = "yes";
+                    for (int i = 0; i <= champion.size(); i++) {
+                        if (champion.get(i).getDriverName().equals(name)) {
+                            champion.get(i).addStats(one, two, three, points, races);
+                            state2 = "y";
+                            break;
+                        } else {
+                            state2 = "no";
+                            continue;
+                        }
+                    }
+                    if (state2.equals("no")) {
+                        System.out.println("No driver found");
+                        break;
+                    }
+                    break;
+                case "Z":
+                    f1Table();
+
+
 
             }
         }
 
 
     }
+
+
 
     public static void printMenu() {
         System.out.println("\nMake a selection: ");
@@ -120,16 +162,6 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
     }
 
 
-    public static void initialise() {
-        //printing out all of the objects with their default value that is empty
-        for (int i = 0; i < champion.length; i++) {
-            champion[i] = new Formula1Driver("empty", "empty");
-            // System.out.println("this position " + (i+1) + " is taken by the team " + champion[i].getDriverTeam());
-
-        }
-
-    }
-
     public static void championshipDrivers() {
         System.out.println("Drivers participating in the F1 championship 2021");
         for (Formula1Driver driver : champion) {
@@ -140,4 +172,17 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
     }
 
 
+    public static void f1Table() {
+        Collections.sort(champion,Collections.reverseOrder());
+        for (Formula1Driver s: champion) {
+            System.out.println(s.getDriverName()+ " " + s.getTotalPoints()
+                    + " " + s.getDriverTeam());
+        }
+
+
+    }
 }
+
+
+
+
