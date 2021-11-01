@@ -103,7 +103,13 @@ public class Formula1Driver extends Driver implements Comparable {
     @Override
     public int compareTo(Object obj) {
         int points = ((Formula1Driver)obj).getTotalPoints();
-        return points-this.totalPoints;
+        if(points==this.totalPoints){
+            int position = ((Formula1Driver)obj).getFirstPosition();
+            return position-this.firstPosition;
+        }else{
+            return points-this.totalPoints;
+
+        }
 
     }
 }

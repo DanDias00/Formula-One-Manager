@@ -203,8 +203,8 @@ public class Formula1ChampionshipManager implements ChampionshipManager{
     public static void f1Table() {
         Collections.sort(champion);
         for (Formula1Driver f1: champion) {
-            System.out.println(f1.getDriverName()+ " " + f1.getTotalPoints()
-                    + " " + f1.getDriverTeam());
+            System.out.println(f1.getDriverName()+ " " + f1.getDriverTeam()
+                    + " " + f1.getTotalPoints() + " " + f1.getFirstPosition());
         }
 
 
