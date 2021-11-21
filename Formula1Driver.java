@@ -1,7 +1,6 @@
-import java.util.Comparator;
+import java.io.Serializable;
 
-
-public class Formula1Driver extends Driver implements Comparator<Formula1Driver> {
+public class Formula1Driver extends Driver implements Comparable , Serializable {
 
     private String driverTeam;
     private int totalPoints;
@@ -20,9 +19,17 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
         this.thirdPosition = 0;
     }
 
-    public Formula1Driver(String driverName, String location) {
+    public Formula1Driver(String driverName, String driverTeam,String location, int firstPosition, int secondPosition, int thirdPosition, int totalPoints, int totalRaces) {
         super(driverName, location);
+        this.driverTeam = driverTeam;
+        this.totalPoints = totalPoints;
+        this.totalRaces = totalRaces;
+        this.firstPosition = firstPosition;
+        this.secondPosition = secondPosition;
+        this.thirdPosition = thirdPosition;
     }
+
+
 
     public String getDriverTeam() {
         return driverTeam;
@@ -36,82 +43,67 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
         return totalPoints;
     }
 
-    public void setTotalPoints(int totalPoints) {
-        this.totalPoints = totalPoints;
+    public void setTotalPoints(int points) {
+
     }
 
     public int getTotalRaces() {
         return totalRaces;
     }
 
-    public void setTotalRaces(int totalRaces) {
-        this.totalRaces = totalRaces;
+    public void setTotalRaces(int races) {
+
+
     }
 
     public int getFirstPosition() {
         return firstPosition;
     }
 
-    public void setFirstPosition(int firstPosition) {
-        this.firstPosition = firstPosition;
+    public void setFirstPosition(int position) {
+        firstPosition = firstPosition + position;
     }
 
     public int getSecondPosition() {
         return secondPosition;
     }
 
-    public void setSecondPosition(int secondPosition) {
-        this.secondPosition = secondPosition;
+    public void setSecondPosition(int position) {
+
+        secondPosition = secondPosition + position;
     }
 
     public int getThirdPosition() {
         return thirdPosition;
     }
 
-    public void setThirdPosition(int thirdPosition) {
-        this.thirdPosition = thirdPosition;
+    public void setThirdPosition(int position) {
+
+        thirdPosition = thirdPosition + position;
     }
 
     public void statistics() {
         System.out.println("Statistics of " + getDriverTeam() + " driver , " + getDriverName());
         System.out.println("First place positions : " + getFirstPosition());
-        System.out.println("First place positions : " + getSecondPosition());
-        System.out.println("First place positions : " + getThirdPosition());
+        System.out.println("second place positions : " + getSecondPosition());
+        System.out.println("third place positions : " + getThirdPosition());
         System.out.println( "Total points : " + getTotalPoints());
         System.out.println("Total races : " + getTotalRaces());
 
     }
 
+    public void addStats(int one, int two ,int three, int points, int races){
 
-    public void deleteDriverAndTeam(){
-        this.setDriverTeam("empty");
-        this.setDriverTeam("empty");
-        System.out.println("Deleted successfully");
-    }
+        totalPoints = totalPoints+points;
+        this.setTotalPoints(totalPoints);
 
-    public void UpdateTeamDriver(String name){
-        this.setDriverName(name);
-        System.out.println("Driver updated");
-
-    }
-
-    public void addStats(int one,int two, int three, int points,int races){
+        totalRaces = totalRaces+races;
+        this.setTotalRaces(totalRaces);
         this.setFirstPosition(one);
         this.setSecondPosition(two);
         this.setThirdPosition(three);
-        this.setTotalPoints(points);
-        this.setTotalRaces(races);
-        System.out.println("All set");
     }
 
-
-    @Override
-    public int compare(Formula1Driver o1, Formula1Driver o2) {
-
-        int point1 = o1.getTotalPoints();
-        int point2 = o2.getTotalPoints();
-        return point2-point1;
-    }
 
     @Override
     public String toString() {
@@ -124,4 +116,19 @@ public class Formula1Driver extends Driver implements Comparator<Formula1Driver>
                 ", thirdPosition=" + thirdPosition +
                 '}';
     }
+
+
+   @Override
+    public int compareTo(Object obj) {
+        int points = ((Formula1Driver)obj).getTotalPoints();
+        if(points==this.totalPoints){
+            int position = ((Formula1Driver)obj).getFirstPosition();
+            return position-this.firstPosition;
+        }else{
+            return points-this.totalPoints;
+        }
+
+    }
+
+
 }
