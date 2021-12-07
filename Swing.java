@@ -8,52 +8,51 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.lang.Object;
 
-
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
 public class Swing extends Formula1ChampionshipManager {
     static Formula1ChampionshipManager manager = new Formula1ChampionshipManager();
-    static HashMap<Integer, String> driverStartingPositions = new HashMap<>();
-
-
     public static BufferedImage background;
+    static JFrame frame;
 
+    public Swing() {
+        try {
+            background = ImageIO.read(new File("D:\\Formula1CW\\src\\F1_2022_Aston_Side_Left.jpg"));//adding a background picture
+        } catch (IOException ex) {
+            System.out.println("Error in image");
 
+        }
 
-    public static void main(String[] args) {
+        Collections.sort(championDrivers, new TotalComparator());// by default sorting the list in descending order by total
 
-        new Swing();
+        JTable championTable = new JTable(); //creating table
+        championTable.setForeground(Color.WHITE);
+        championTable.setOpaque(false);
+        championTable.setBackground(new Color(255, 255, 255, 0));
 
-
-        Collections.sort(championDrivers, new TotalComparator());// by default sorting the list in ascending order by total
-
-        JTable t = new JTable(); //creating table
-        t.setForeground(Color.WHITE);
-        t.setOpaque(false);
-        t.setBackground(new Color(255, 255, 255, 0));
-
-        t.setModel(new javax.swing.table.DefaultTableModel(
+        championTable.setModel(new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"Driver name", "Driver team", "Driver location", "First positions", "Second positions ", "Third positions", "Driver total points ", "Total races"}));
-        t.setDefaultEditor(Object.class, null);//makes  the cells non edit
+                new String[]{"Driver name", "Driver team", "Location", "First positions", "Second positions ", "Third positions", "Total points ", "Total races"}));
+        championTable.setDefaultEditor(Object.class, null);//makes  the cells non edit
 
-        addToMainTable(championDrivers, t);//calling the add to table method to add data
-        t.getColumn("Driver name").setPreferredWidth(100);
+        addToMainTable(championDrivers, championTable);//calling the add to table method to add data
+        championTable.getColumn("Driver name").setPreferredWidth(150);
+        championTable.getColumn("Driver team").setPreferredWidth(150);
 
         JPanel panel = new JPanel();
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setViewport(new ImageViewport());
-        scrollPane.setViewportView(t);
-        panel.add(scrollPane);
+        scrollPane.setViewport(new image());
+        scrollPane.setViewportView(championTable);
+        panel.add(scrollPane);//adding scroll panel to the panel
         scrollPane.setPreferredSize(new Dimension(800, 500));
 
         //button to sort by total points
-        JButton sortByDescTotalPointsBtn = new JButton("Sort by total points");
+        JButton sortByDescTotalPointsBtn = new JButton("Sort by total points ASC");
         sortByDescTotalPointsBtn.setBounds(200, 100, 100, 50);
         sortByDescTotalPointsBtn.setSize(100, 50);
 
@@ -78,7 +77,7 @@ public class Swing extends Formula1ChampionshipManager {
         refreshBtn.setSize(100, 50);
 
         //button to check current race positions
-        JButton currentRaceBtn = new JButton("Check  current race");
+        JButton currentRaceBtn = new JButton("Check current race");
         currentRaceBtn.setBounds(5, 100, 100, 50);
         currentRaceBtn.setSize(100, 50);
 
@@ -93,7 +92,7 @@ public class Swing extends Formula1ChampionshipManager {
         probability.setSize(100, 50);
 
 
-        //add everything to panel
+        //add everything to panel and frame
         JFrame frame = new JFrame("Driver championship table");//creating frame
         Image icon = Toolkit.getDefaultToolkit().getImage("D:\\Formula1CW\\src\\f1.png");
         frame.setIconImage(icon);
@@ -110,7 +109,7 @@ public class Swing extends Formula1ChampionshipManager {
         frame.setSize(900, 700);
         frame.setVisible(true);
         frame.setLayout(null);
-        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         //Dialog frame to search driver implementation
         JFrame jFrame = new JFrame();
@@ -122,7 +121,7 @@ public class Swing extends Formula1ChampionshipManager {
 
         JTextField text;
 
-        text = new JTextField(" Enter driver name");
+        text = new JTextField("Enter driver name");
         text.setBounds(150, 90, 200, 30);
 
         JButton closeSearchDialog = new JButton("Close");
@@ -132,6 +131,8 @@ public class Swing extends Formula1ChampionshipManager {
         JButton search = new JButton("Search");
         search.setBounds(100, 200, 200, 30);
         search.setSize(100, 25);
+
+
 
         closeSearchDialog.addActionListener(new ActionListener() {
             @Override
@@ -146,47 +147,48 @@ public class Swing extends Formula1ChampionshipManager {
         driverDialog.setVisible(false);
 
 
-
-
         /*------------------------------------------------------------------------------------------------------------------*/
         sortByDescTotalPointsBtn.addActionListener(new ActionListener() { //action listener for descending order sort
             @Override
             public void actionPerformed(ActionEvent e) {
 
 
-                DefaultTableModel tableModel = (DefaultTableModel) t.getModel();
+                DefaultTableModel tableModel = (DefaultTableModel) championTable.getModel();
                 tableModel.setRowCount(0);
                 Collections.sort(championDrivers, new TotalComparatorReversed());// reversing the order by total
-                addToMainTable(championDrivers, t);
-                System.out.println("total sort works");
+                addToMainTable(championDrivers, championTable);
             }
         });
 
         sortByFirstPositionBtn.addActionListener(new ActionListener() { //action listener for no of points sort
             @Override
             public void actionPerformed(ActionEvent e) {
-                DefaultTableModel tableModel = (DefaultTableModel) t.getModel();
+                DefaultTableModel tableModel = (DefaultTableModel) championTable.getModel();
                 tableModel.setRowCount(0);
                 Collections.sort(championDrivers, new FirstComparator());// sorting according to first places
-                addToMainTable(championDrivers, t);
-                System.out.println("sort by first works");
+                addToMainTable(championDrivers, championTable);
             }
         });
 
         randomRaceBtn.addActionListener(new ActionListener() { //action listener for generating random race
             @Override
             public void actionPerformed(ActionEvent e) {
-                DefaultTableModel tableModel = (DefaultTableModel) t.getModel();
-                tableModel.setRowCount(0);
 
                 try {
-                    manager.race();
-                    Collections.sort(championDrivers, new TotalComparator()); //sorting them in ascending order
-                    addToMainTable(championDrivers, t);
+                    if (championDrivers.size() < 10) {
+                        errorMessage();
+                    } else {
+                        DefaultTableModel tableModel = (DefaultTableModel) championTable.getModel();
+                        tableModel.setRowCount(0);
+                        LocalDate date1 = RandomDate(2021, 2021);
+                        //creating date obj
+                        manager.race(date1); //passing date obj to race method making it not null
+                        Collections.sort(championDrivers, new TotalComparator()); //sorting them in ascending order
+                        addToMainTable(championDrivers, championTable);
+                    }
                 } catch (ParseException parseException) {
                     parseException.printStackTrace();
                 }
-
 
             }
         });
@@ -194,76 +196,80 @@ public class Swing extends Formula1ChampionshipManager {
         refreshBtn.addActionListener(new ActionListener() { //refresh button to refresh the championship table
             @Override
             public void actionPerformed(ActionEvent e) {
-                DefaultTableModel tableModel = (DefaultTableModel) t.getModel();
+                DefaultTableModel tableModel = (DefaultTableModel) championTable.getModel();
                 tableModel.setRowCount(0);
                 Collections.sort(championDrivers, new TotalComparator()); //sorting using ascending order
-                addToMainTable(championDrivers, t);//adding drivers to the main table
-                System.out.println("updated");
+                addToMainTable(championDrivers, championTable);//adding drivers to the main table
 
             }
         });
 
-        checkRacePosition.addActionListener(new ActionListener() {
+        checkRacePosition.addActionListener(new ActionListener() { // check all races and its positions
             @Override
             public void actionPerformed(ActionEvent e) {
-                manager.showRaces(); //calling method to show all races
-                showRaceHistory(); // adding the frame to show all races
+                if (championDrivers.size() < 10) {
+                    errorRaceMessage();
 
+                } else {
+                    manager.showRaces(); //calling method to show all races
+                    showRaceHistory(); // adding the frame to show all races
+                }
 
             }
         });
 
-        currentRaceBtn.addActionListener(new ActionListener() {
+        currentRaceBtn.addActionListener(new ActionListener() { //check current race positions
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                showIndividualRaceFrame();
+                if (championDrivers.size() < 10) {
+                    errorRaceMessage();
+                } else {
+                    showIndividualRaceFrame();
+                }
             }
         });
 
-        searchBtn.addActionListener(new ActionListener() {
+        searchBtn.addActionListener(new ActionListener() { //search button to search for driver
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (championDrivers.size() < 10) {
+                    errorSearchMessage();
 
-                driverDialog.setVisible(true);
-
-
+                } else {
+                    driverDialog.setVisible(true);
+                }
             }
         });
 
-        search.addActionListener(new ActionListener() {
+        search.addActionListener(new ActionListener() { //search button after entering driver name
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = text.getText().toUpperCase();
-                SearchDriverResultFrame(name);
+                SearchDriverResultFrame(name);//calling the search driver method with name as input
             }
         });
 
-        probability.addActionListener(new ActionListener() {
+        probability.addActionListener(new ActionListener() { //race win according to probability
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                DefaultTableModel tableModel = (DefaultTableModel) t.getModel();
+                DefaultTableModel tableModel = (DefaultTableModel) championTable.getModel();
                 tableModel.setRowCount(0);
                 randomPositionAllocation();
                 Collections.sort(championDrivers, new TotalComparator());// the order by total
-                addToMainTable(championDrivers, t);
-
-
+                addToMainTable(championDrivers, championTable);
             }
         });
-
-
     }
 
-    //Methods used in Swing implementation
+    //Methods
 
     public static void searchRaceDriver(String name, JTable jTable) {  // method to search a driver
-        for (int i = 0; i < races.size(); i++) {
-            for (int j = 0; j < championDrivers.size(); j++) {
-                if (races.get(i).getRaceMap().get(j).equals(name)) {
-                    ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{" Race on " + races.get(i).getDate(), "Position " + (j + 1), races.get(i).getRaceMap().get(j)});
 
+        for (Race race : races) {
+            for (int j = 0; j < championDrivers.size(); j++) {
+                if (race.getRaceMap().get(j).equals(name)) {
+                    ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{" Race on " + race.getDate(), "Position " + (j + 1), race.getRaceMap().get(j)});
                 }
             }
         }
@@ -275,117 +281,84 @@ public class Swing extends Formula1ChampionshipManager {
         for (Formula1Driver driver : f1) {
             ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{
                     driver.getDriverName(), driver.getDriverTeam(), driver.getLocation(), driver.getFirstPosition(), driver.getSecondPosition(), driver.getThirdPosition(), driver.getTotalPoints(), driver.getTotalRaces()});
-
         }
 
     }
 
 
-    public static void addToRaceTable(JTable jTable) { //adding the drivers to the table
+    public static void addToRaceHistoryTable(JTable jTable) { //adding the drivers to the history table
         Collections.sort(races, new dateSorting()); //sorting according to the date
 
-        for (int i = 0; i < races.size(); i++) {
-            ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{"Race " + " On " + races.get(i).getDate(), " ", " "});
+        for (Race race : races) {
+            ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{"Race " + " On " + race.getDate(), " ", " "});
             for (int j = 0; j < championDrivers.size(); j++) {
-                ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{(j + 1), races.get(i).getRaceMap().get(j)});
+                ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{(j + 1), race.getRaceMap().get(j)});
             }
-
-
         }
-
     }
 
-    public static void individualRacePositions(JTable jTable) { //Getting individual positions of each race
-        for (int j = 0; j < manager.perRaceMap.size(); j++) {
-            ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{(j + 1), manager.perRaceMap.get(j)});
-
+    public static void perRacePositions(JTable jTable) { //Getting individual positions of each race
+        for (int j = 0; j < perRaceMap.size(); j++) {
+            ((DefaultTableModel) jTable.getModel()).addRow(new Object[]{(j + 1), perRaceMap.get(j)});
         }
-
     }
 
 
     public static void randomPositionAllocation() {
-        Date date;
+        if (!(championDrivers.size() < 10)) {
+            LocalDate date;
+            date = RandomDate(2021, 2021);
 
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        date = new Date();
-        System.out.println(formatter.format(date));
+            HashMap<Integer, String> positionMap = new HashMap<>();//hashmap to add positions of the current race
+            int[] probability = {40, 30, 10, 10, 2, 2, 2, 2, 2};//adding the probabilities as a percentage
 
-        HashMap<Integer, String> positionMap = new HashMap<>();
+            Collections.shuffle(championDrivers); //shuffling the drivers names randomly
 
+            int winner = firstPositionProbability(probability);//getting the winner index
 
-        int[] percentages = {40, 30, 10, 10, 2, 2, 2, 2, 2};//adding the probabilities as a percentage
+            String winnerDriver = "";
+            for (Formula1Driver championDriver : championDrivers) {
+                if (championDriver.getDriverName().equals(championDrivers.get(winner).getDriverName())) { //checking driver who has won
+                    winnerDriver = championDrivers.get(winner).getDriverName(); //storing winning driver name
+                     break;
 
-
-        Collections.shuffle(championDrivers); //shuffling the drivers names
-        System.out.println("after shuffle " + championDrivers);
-
-        for (int i = 0; i < championDrivers.size(); i++) {
-            driverStartingPositions.put(i, championDrivers.get(i).getDriverName()); //adding the random driver names to a temp per race hashmap
-        }
-
-      //  System.out.println(driverStartingPositions);
-
-
-        int winner = pickWinner(percentages);
-        System.out.println(winner);
-
-
-        String winnerDriver = "";
-
-
-       for (int i = 0; i < championDrivers.size(); i++) {
-            if (championDrivers.get(i).getDriverName().equals(championDrivers.get(winner).getDriverName())) {
-                winnerDriver = championDrivers.get(winner).getDriverName();
-                System.out.println(winnerDriver);
-
-
-            }
-        }
-
-
-       // System.out.println(driverStartingPositions);
-        Collections.shuffle(championDrivers);
-        System.out.println("After final " +championDrivers);
-        for(int i=0;i<championDrivers.size();i++){
-            if(championDrivers.get(i).getDriverName().equals(winnerDriver)){
-                Collections.swap(championDrivers,0,i);
-            }
-        }
-        System.out.println(championDrivers);
-
-
-        for (int i = 0; i < championDrivers.size(); i++) {
-           positionMap.put(i, championDrivers.get(i).getDriverName());//adding the positions to the position hashmap
-        }
-
-      /*  for (int i = 0; i < championDrivers.size(); i++) {
-            perRaceMap.put(i, championDrivers.get(i).getDriverName()); //
-        }*/
-        perRaceMap.putAll(positionMap);
-
-       // System.out.println("Hashmap " + positionMap);
-
-        races.add(new Race(date, positionMap)); //adding the race positions to the race class
-       // System.out.println("race added");
-
-        manager.statUpdate();
-
-    }
-    public static int pickWinner(int[] percentages) {
-
-
-
-            int randomNumber = (int) (Math.random() * 100);
-            int countdown = randomNumber;
-            for (int i = 0; i < percentages.length; i++) {
-                countdown -= percentages[i];
-                if (countdown < 0) {
-                    return i;
                 }
             }
-            return -1;
+
+            Collections.shuffle(championDrivers); //shuffling the drivers again randomly
+            for (int i = 0; i < championDrivers.size(); i++) {
+                if (championDrivers.get(i).getDriverName().equals(winnerDriver)) {
+                    Collections.swap(championDrivers, 0, i);//swapping the winning driver to the first position
+                }
+            }
+
+
+            for (int i = 0; i < championDrivers.size(); i++) {
+                positionMap.put(i, championDrivers.get(i).getDriverName());//adding the positions to the position hashmap
+            }
+
+            perRaceMap.putAll(positionMap);
+            races.add(new Race(date, positionMap)); //adding the race positions to the race class
+            manager.statUpdate();//updating the stats
+        } else {
+
+            errorMessage();
         }
+
+    }
+
+
+    public static int firstPositionProbability(int[] probability) {
+
+        int number = (int) (Math.random() * 100);
+        for (int i = 0; i < probability.length; i++) {
+            number -= probability[i];
+            if (number < 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 
     public static void showRaceHistory() { //shows the history of all races and its positions
@@ -401,7 +374,7 @@ public class Swing extends Formula1ChampionshipManager {
                 new String[]{"Driver position", "Driver name"}));
         table.setDefaultEditor(Object.class, null);//makes  the cells non edit
 
-        addToRaceTable(table);
+        addToRaceHistoryTable(table);//calling the add to table method
 
         JButton previousBtn = new JButton("Close");
         previousBtn.setBounds(100, 100, 100, 50);
@@ -409,12 +382,12 @@ public class Swing extends Formula1ChampionshipManager {
 
         JPanel historyPanel = new JPanel();
         JScrollPane historyScrollPane = new JScrollPane();
-        historyScrollPane.setViewport(new ImageViewport());
+        historyScrollPane.setViewport(new image());
         historyScrollPane.setViewportView(table);
         historyPanel.add(historyScrollPane);
         historyScrollPane.setPreferredSize(new Dimension(850, 500));
 
-        JFrame historyFrame = new JFrame("Race table");//creating frame
+        JFrame historyFrame = new JFrame("Race Results Table");//creating frame
         Image icon = Toolkit.getDefaultToolkit().getImage("D:\\Formula1CW\\src\\f1.png");
         historyFrame.setIconImage(icon);
 
@@ -424,10 +397,10 @@ public class Swing extends Formula1ChampionshipManager {
         historyFrame.setSize(900, 700);
         historyFrame.setVisible(true);
         historyFrame.setLayout(null);
-        historyFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        historyFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 
-        previousBtn.addActionListener(new ActionListener() {
+        previousBtn.addActionListener(new ActionListener() { //making the frame not visible on button click
             @Override
             public void actionPerformed(ActionEvent e) {
                 historyFrame.setVisible(false);
@@ -436,8 +409,7 @@ public class Swing extends Formula1ChampionshipManager {
 
     }
 
-
-        public static void showIndividualRaceFrame() { //shows the latest race with its positions and drivers
+    public static void showIndividualRaceFrame() { //shows the latest race with its positions and drivers
 
         JTable tableRace = new JTable(); //creating tableRace
         tableRace.setForeground(Color.WHITE);
@@ -449,7 +421,7 @@ public class Swing extends Formula1ChampionshipManager {
                 new Object[][]{},
                 new String[]{"Driver position", "Driver name"}));
         tableRace.setDefaultEditor(Object.class, null);//makes  the cells non edit
-        individualRacePositions(tableRace);
+        perRacePositions(tableRace);
 
         JButton closeBtn = new JButton("Close");
         closeBtn.setBounds(100, 100, 100, 50);
@@ -457,12 +429,12 @@ public class Swing extends Formula1ChampionshipManager {
 
         JPanel racePanel = new JPanel();
         JScrollPane raceScrollPane = new JScrollPane();
-        raceScrollPane.setViewport(new ImageViewport());
+        raceScrollPane.setViewport(new image());
         raceScrollPane.setViewportView(tableRace);
         racePanel.add(raceScrollPane);
         raceScrollPane.setPreferredSize(new Dimension(850, 500));
 
-        JFrame raceFrame = new JFrame("Race tableRace");//creating frame
+        JFrame raceFrame = new JFrame("Latest Race Results");//creating frame
         Image icon = Toolkit.getDefaultToolkit().getImage("D:\\Formula1CW\\src\\f1.png");
         raceFrame.setIconImage(icon);
 
@@ -472,7 +444,7 @@ public class Swing extends Formula1ChampionshipManager {
         raceFrame.setSize(900, 700);
         raceFrame.setVisible(true);
         raceFrame.setLayout(null);
-        raceFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        raceFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 
         closeBtn.addActionListener(new ActionListener() {
@@ -495,9 +467,9 @@ public class Swing extends Formula1ChampionshipManager {
 
         searchTable.setModel(new DefaultTableModel(
                 new Object[][]{},
-                new String[]{"Race date ", "Driver position","Driver name"}));
+                new String[]{"Race date ", "Driver position", "Driver name"}));
         searchTable.setDefaultEditor(Object.class, null);//makes  the cells non edit
-        searchRaceDriver(name,searchTable);//calling the method to search for driver
+        searchRaceDriver(name, searchTable);//calling the method to search for driver
 
         JButton closeSearchBtn = new JButton("Close");
         closeSearchBtn.setBounds(100, 100, 100, 50);
@@ -505,12 +477,12 @@ public class Swing extends Formula1ChampionshipManager {
 
         JPanel searchPanel = new JPanel();
         JScrollPane searchScrollPane = new JScrollPane();
-        searchScrollPane.setViewport(new ImageViewport());
+        searchScrollPane.setViewport(new image());
         searchScrollPane.setViewportView(searchTable);
         searchPanel.add(searchScrollPane);
         searchScrollPane.setPreferredSize(new Dimension(850, 500));
 
-        JFrame searchFrame = new JFrame("Race tableRace");//creating frame
+        JFrame searchFrame = new JFrame("Driver Race Results");//creating frame
         Image icon = Toolkit.getDefaultToolkit().getImage("D:\\Formula1CW\\src\\f1.png");
         searchFrame.setIconImage(icon);
 
@@ -520,7 +492,7 @@ public class Swing extends Formula1ChampionshipManager {
         searchFrame.setSize(900, 700);
         searchFrame.setVisible(true);
         searchFrame.setLayout(null);
-        searchFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        searchFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 
         closeSearchBtn.addActionListener(new ActionListener() {
@@ -532,21 +504,26 @@ public class Swing extends Formula1ChampionshipManager {
 
     }
 
-    //https://www.oracle.com/java/technologies/painting.html
+    //Methods for error handling pop ups
+    public static void errorMessage() {
 
-    public Swing() {
-        try {
-            background = ImageIO.read(new File("D:\\Formula1CW\\src\\F1_2022_Aston_Side_Left.jpg"));//adding a background picture
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
+        JOptionPane.showMessageDialog(frame, "Cannot run race without at least 10 drivers.", "Alert", JOptionPane.WARNING_MESSAGE);
     }
 
+    public static void errorRaceMessage() {
 
-    public static class ImageViewport extends JViewport {
+        JOptionPane.showMessageDialog(frame, "No race found.", "Alert", JOptionPane.WARNING_MESSAGE);
+    }
 
-        public ImageViewport() {
+    public static void errorSearchMessage() {
+
+        JOptionPane.showMessageDialog(frame, "Cannot search drivers without running a race.", "Alert", JOptionPane.WARNING_MESSAGE);
+    }
+    //https://www.oracle.com/java/technologies/painting.html
+
+    public static class image extends JViewport {
+
+        public image() {
         }
 
         @Override

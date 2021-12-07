@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class Formula1Driver extends Driver implements Comparable , Serializable {
+public class Formula1Driver extends Driver implements Comparable, Serializable {
 
     private String driverTeam;
     private int totalPoints;
@@ -9,26 +9,15 @@ public class Formula1Driver extends Driver implements Comparable , Serializable 
     private int secondPosition;
     private int thirdPosition;
 
-    public Formula1Driver(String driverName, String driverTeam, String location){
-        super(driverName,location);
-        this.driverTeam=driverTeam;
+    public Formula1Driver(String driverName, String driverTeam, String location) {
+        super(driverName, location);
+        this.driverTeam = driverTeam;
         this.totalPoints = 0;
         this.totalRaces = 0;
         this.firstPosition = 0;
         this.secondPosition = 0;
         this.thirdPosition = 0;
     }
-
-    public Formula1Driver(String driverName, String driverTeam,String location, int firstPosition, int secondPosition, int thirdPosition, int totalPoints, int totalRaces) {
-        super(driverName, location);
-        this.driverTeam = driverTeam;
-        this.totalPoints = totalPoints;
-        this.totalRaces = totalRaces;
-        this.firstPosition = firstPosition;
-        this.secondPosition = secondPosition;
-        this.thirdPosition = thirdPosition;
-    }
-
 
 
     public String getDriverTeam() {
@@ -52,8 +41,6 @@ public class Formula1Driver extends Driver implements Comparable , Serializable 
     }
 
     public void setTotalRaces(int races) {
-
-
     }
 
     public int getFirstPosition() {
@@ -87,17 +74,16 @@ public class Formula1Driver extends Driver implements Comparable , Serializable 
         System.out.println("First place positions : " + getFirstPosition());
         System.out.println("second place positions : " + getSecondPosition());
         System.out.println("third place positions : " + getThirdPosition());
-        System.out.println( "Total points : " + getTotalPoints());
+        System.out.println("Total points : " + getTotalPoints());
         System.out.println("Total races : " + getTotalRaces());
 
     }
 
-    public void addStats(int one, int two ,int three, int points, int races){
+    public void addStats(int one, int two, int three, int points, int races) {
 
-        totalPoints = totalPoints+points;
+        totalPoints = totalPoints + points;
         this.setTotalPoints(totalPoints);
-
-        totalRaces = totalRaces+races;
+        totalRaces = totalRaces + races;
         this.setTotalRaces(totalRaces);
         this.setFirstPosition(one);
         this.setSecondPosition(two);
@@ -117,18 +103,15 @@ public class Formula1Driver extends Driver implements Comparable , Serializable 
                 '}';
     }
 
-
-   @Override
+    @Override
     public int compareTo(Object obj) {
-        int points = ((Formula1Driver)obj).getTotalPoints();
-        if(points==this.totalPoints){
-            int position = ((Formula1Driver)obj).getFirstPosition();
-            return position-this.firstPosition;
-        }else{
-            return points-this.totalPoints;
+        int points = ((Formula1Driver) obj).getTotalPoints();
+        if (points == this.totalPoints) {
+            int position = ((Formula1Driver) obj).getFirstPosition();
+            return position - this.firstPosition;
+        } else {
+            return points - this.totalPoints;
         }
-
     }
-
 
 }

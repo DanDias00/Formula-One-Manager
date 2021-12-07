@@ -2,40 +2,32 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-public class testClass extends Thread{
+public class testClass extends Thread {
     static Scanner sc = new Scanner(System.in).useDelimiter("\n");
     static Formula1ChampionshipManager manager = new Formula1ChampionshipManager();
 
 
-
-    public static void main(String[] args) {
-
-     //   new Thread(() -> test.main(null)).start();
-
-
-
+    public static void main(String[] args) throws IOException {
+        manager.Load();
 
         while (true) {
+
             manager.printMenu();
+
             String choice = sc.next().toUpperCase();
             switch (choice) {
                 case "A":
                     manager.addDriver();
-                    manager.championshipDrivers();
                     break;
-
                 case "D":
                     manager.deleteDriverTeam();
                     break;
-
                 case "U":
                     manager.update();
-                    manager.championshipDrivers();
                     break;
 
                 case "DS":
                     manager.displayStats();
-
                     break;
                 case "X":
                     manager.addStats();
@@ -46,35 +38,28 @@ public class testClass extends Thread{
 
                 case "R":
                     try {
-                        manager.race();
+                        manager.race(null);
                     } catch (ParseException e) {
                         System.out.println("Enter proper date format");
                     }
                     break;
                 case "S":
-                    try {
-                        manager.Store();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    manager.Store();
                     break;
 
                 case "L":
-                    try {
-                        manager.Load();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    manager.Load();
                     break;
                 case "SR":
                     manager.showRaces();
                     break;
                 case "G":
-                    new Thread(() -> Swing.main(null)).start();//starting a new thread to run the swing implementation
-
-
-                break;
-
+                    new Swing();
+                    break;
+                case "E":
+                    System.out.println("You decided to leave..Thank you!");
+                    System.exit(0);
+                    break;
                 default:
                     System.out.println("Invalid input..try again");
 

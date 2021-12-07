@@ -1,19 +1,17 @@
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 public class Race implements Serializable {
-    private  Date date;
+    private LocalDate date;
     private HashMap raceMap;
 
-    public Race(Date date, HashMap raceMap) {
+    public Race(LocalDate date, HashMap raceMap) {
         this.date = date;
         this.raceMap = raceMap;
     }
 
-
-
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -24,8 +22,6 @@ public class Race implements Serializable {
                 ", raceMap=" + raceMap +
                 '}';
     }
-
-
 
     public HashMap getRaceMap() {
         return raceMap;

@@ -1,16 +1,15 @@
-import java.awt.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.io.*;
-import java.util.*;;
+import java.util.*;
 
 
 public class Formula1ChampionshipManager implements ChampionshipManager {
 
     static Scanner sc = new Scanner(System.in).useDelimiter("\n");
-    public static ArrayList<Formula1Driver> championDrivers = new ArrayList<>();
-    public static ArrayList<Race> races = new ArrayList<>();
+    public static ArrayList<Formula1Driver> championDrivers = new ArrayList<>();//arraylist to store the drivers
+    public static ArrayList<Race> races = new ArrayList<>(); // arraylist to store races
     public static HashMap<Integer, String> perRaceMap = new HashMap<>();
 
 
@@ -20,10 +19,11 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
         System.out.println("A. Add a driver to championship");
         System.out.println("D. Delete driver and team");
         System.out.println("U. Change driver from existing team.");
-        System.out.println("S .Display statistics of a driver.");
-        System.out.println("F .Display F1 table.");
-        System.out.println("R .Add a race completed");
         System.out.println("X .Add a driver stats");
+        System.out.println("DS .Display statistics of a driver.");
+        System.out.println("SR .Display race results.");
+        System.out.println("R .Add a race completed");
+        System.out.println("F .Display F1 table.");
         System.out.println("S .Store program.");
         System.out.println("L . Load program");
         System.out.println("E. Exit\n");
@@ -49,7 +49,7 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
                 driverState = "no";
             }
         }
-        if (driverState == "y") {
+        if (driverState.equals("y")) {
             System.out.println("Sorry driver with same name exist..try a different name");
         } else {
 
@@ -72,7 +72,7 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
                 }
             }
 
-            if (teamState == "y") {
+            if (teamState.equals("y")) {
                 System.out.println("Sorry team already has a driver...try again");
             } else {
 
@@ -115,13 +115,12 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
         }
         for (int i = 0; i < championDrivers.size(); i++) {
             try {
-                if (championDrivers.get(i).getDriverTeam().equals(team)) { //checking for driver in a team
+                if (championDrivers.get(i).getDriverTeam().equals(team) && !(championDrivers.get(i).getDriverName().equals(newName))) { //checking for driver in a team
                     championDrivers.get(i).setDriverName(newName); //setting new driver to existing team
                     driverList = "y";
                     break;
                 } else {
                     driverList = "n";
-                    continue;
                 }
             } catch (Exception e) {
                 System.out.println("Error");
@@ -129,20 +128,21 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
 
         }
         if (driverList.equals("n")) {
-            System.out.println("team entered wrong..try again");
+            System.out.println("team entered wrong..or driver with same name exist already...try again");
         }
+
     }
 
     @Override
     public void deleteDriverTeam() {
 
         System.out.println("Enter driver name to delete : ");
-        String dname = sc.next().toUpperCase();
-        dname += sc.nextLine();
-        while (!dname.matches("^[a-zA-Z_ ]*$")) {
+        String dName = sc.next().toUpperCase();
+        dName += sc.nextLine();
+        while (!dName.matches("^[a-zA-Z_ ]*$")) {
             System.out.println("Please enter a string input only");
             System.out.println("Enter driver name to delete : ");
-            dname = sc.nextLine().toUpperCase();
+            dName = sc.nextLine().toUpperCase();
         }
         System.out.println("Enter Driver team to delete : ");
         String dTeam = sc.next().toUpperCase();
@@ -152,79 +152,76 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
             System.out.println("Enter Driver team to delete : ");
             dTeam = sc.nextLine().toUpperCase();
         }
-        String state01 = "check";
+        String deleteCheck = "check";
         if (championDrivers.isEmpty()) {
             System.out.println("Driver list is empty.No drivers to delete");
         }
         for (int i = 0; i < championDrivers.size(); i++) {
-            if (championDrivers.get(i).getDriverName().equals(dname) && (championDrivers.get(i).getDriverTeam().equals(dTeam))) {
+            if (championDrivers.get(i).getDriverName().equals(dName) && (championDrivers.get(i).getDriverTeam().equals(dTeam))) {//check if both driver and team already exist
                 championDrivers.remove(i);
-                state01 = "y";
+                deleteCheck = "y";
 
                 break;
 
             } else {
-                state01 = "n";
-                continue;
+                deleteCheck = "n";
             }
 
         }
-        if (state01.equals("n")) {
+        if (deleteCheck.equals("n")) {
             System.out.println("Driver name or team added incorrectly");
         }
 
     }
 
-    public void championshipDrivers() {
-        System.out.println("Drivers participating in the F1 championship 2021");
-        for (Formula1Driver driver : championDrivers) {
-            if (!(driver.getDriverTeam().equals("empty"))) {
-                System.out.println("Driver name: " + driver.getDriverName() + "| Driver Team : " + driver.getDriverTeam());
-            }
-        }
-    }
 
     @Override
     public void addStats() {
-        int one = 0;
-        int two = 0;
-        int three = 0;
-        int points = 0;
-        int races = 0;
-
-        System.out.println("Enter driver name to add stats : ");
-        String name = sc.next().toUpperCase();
-        name += sc.nextLine();
-        System.out.println("Enter first place positions : ");
+        int one, two, three, points, races;
         try {
+
+            if (championDrivers.isEmpty()) {
+                System.out.println("No driver list.Cannot add driver stat");
+            }
+
+            System.out.println("Enter driver name to add stats : ");
+            String name = sc.next().toUpperCase();
+            name += sc.nextLine();
+            while (!name.matches("^[a-zA-Z_ ]*$")) {
+                System.out.println("Please enter a valid driver name");
+                System.out.println("Enter driver name to add stats2: ");
+                name = sc.nextLine().toUpperCase();
+            }
+            System.out.println("Enter first place positions : ");
             one = sc.nextInt();
             System.out.println("Enter second place positions : ");
             two = sc.nextInt();
             System.out.println("Enter third place positions : ");
             three = sc.nextInt();
-            System.out.println("total points : ");
+            System.out.println("total points: ");
             points = sc.nextInt();
             System.out.println("Enter total races : ");
             races = sc.nextInt();
-        } catch (InputMismatchException e) {
-        }
-        if (championDrivers.isEmpty()) {
-            System.out.println("No driver list.Cannot add driver stat");
-        }
-        String driverCheck = "yes";
 
-        for (int i = 0; i < championDrivers.size(); i++) {
-            if (championDrivers.get(i).getDriverName().equals(name)) {
-                championDrivers.get(i).addStats(one, two, three, points, races);
-                driverCheck = "y";
-                break;
-            } else {
-                driverCheck = "no";
-                continue;
+            String driverCheck = "yes";
+            for (int i = 0; i < championDrivers.size(); i++) {
+                if (championDrivers.get(i).getDriverName().equals(name)) {
+                    championDrivers.get(i).addStats(one, two, three, points, races);//adding stat to drivers
+                    driverCheck = "yes";
+                    break;
+                } else {
+                    driverCheck = "no";
+                }
             }
-        }
-        if (driverCheck.equals("no")) {
-            System.out.println("No driver found");
+            if (driverCheck.equals("no")) {
+                System.out.println("No driver found");
+
+
+            }
+
+        } catch (InputMismatchException e) {
+            System.out.println("Enter integers only");
+
         }
     }
 
@@ -250,7 +247,6 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
                 break;
             } else {
                 driverCheck = "no";
-                continue;
             }
         }
         if (driverCheck.equals("no")) {
@@ -259,70 +255,54 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
 
     }
 
-    @Override
-    public void race() throws ParseException {
-        Calendar cal = Calendar.getInstance();
+
+    public void race(LocalDate dateInput) throws ParseException {
 
         //https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
 
         HashMap<Integer, String> driverMap = new HashMap<>();
-        Date date1;
 
-        boolean active = false;
-        //implements race date
-        if (championDrivers.size() < 10) {
-            System.out.println("Cannot start race with less than 10 drivers");
-        } else {
+        try {
+            if (championDrivers.size() < 10) {
 
-            Window[] y = Window.getWindows();//check if gui window frame is active
-            for (int i = 0; i < y.length; i++) {
-                if (y[i].getName().equals("Driver championship table")) ;
-                active = true;
-                break;
-            }
-            while (true)
-                if (active) { //if active date is generated automatically
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-                    date1 = new Date();
-                    System.out.println(formatter.format(date1));
-                    break;
+                System.out.println("Cannot start race with less than 10 drivers");
+            } else {
+                if (dateInput != null) { //check if date input is null or not
+                    dateInput = RandomDate(2021, 2021);
 
                 } else { //manually enter date
-                    System.out.println("Add race date in the format dd-MMM-yyyy HH:mm:ss");
+                    System.out.println("Add race date in the format M/d/yyyy");
                     String date = sc.next();
-                    try {
-
-                        SimpleDateFormat date2 = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-                        date1 = date2.parse(date);
-
-
-
-                        Collections.shuffle(championDrivers); //shuffling the drivers names
-
-                        for (int i = 0; i < championDrivers.size(); i++) {
-                            driverMap.put(i, championDrivers.get(i).getDriverName()); //adding the random driver names to a hashmap
-                        }
-
-                        perRaceMap.putAll(driverMap); //copying the hashmap to static  hashMap
-                        races.add(new Race(date1, driverMap));//adding the race hashmap to race class alongside the date
-                        statUpdate();//calling the update stat method
-                        break;
-                    } catch (Exception e) {
-                        System.out.println("Incorrect format entered");
-                    }
-
+                    date += sc.nextLine();
+                    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M/d/yyyy");
+                    dateInput = LocalDate.parse(date, dateFormat);
 
                 }
+                Collections.shuffle(championDrivers); //shuffling the drivers names
 
+                for (int i = 0; i < championDrivers.size(); i++) {
+                    driverMap.put(i, championDrivers.get(i).getDriverName()); //adding the random driver names to a hashmap
+                }
 
-
-                    // System.out.println(championDrivers);
-
-
+                perRaceMap.putAll(driverMap); //copying the hashmap to static  hashMap
+                races.add(new Race(dateInput, driverMap));//adding the race hashmap to race class alongside the date
+                statUpdate();//calling the update stat method
+            }
+        } catch (Exception e) {
+            System.out.println("Incorrect format entered");
         }
     }
 
+    public static int randomInteger(int startInt, int endInt) {
+        return startInt + (int) Math.round(Math.random() * (endInt - startInt));//generating a random no considering the params
+    }
 
+    public static LocalDate RandomDate(int startYear, int endYear) {
+        int randomDay = randomInteger(1, 30); // generating random day
+        int randomMonth = randomInteger(1, 12); // generating random month
+        int randomYear = randomInteger(startYear, endYear); // generating random year
+        return LocalDate.of(randomYear, randomMonth, randomDay); // returning random date
+    }
 
     @Override
     public void showRaces() {
@@ -340,22 +320,10 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
             System.out.println("Error occurred in show races");
         }
 
-
     }
 
     @Override
     public void statUpdate() {
-/*
-        try {
-            for (int i = 0; i < championDrivers.size(); i++) {
-                championDrivers.set((i), championDrivers.get(listOfDriverValues.get(i))); //assigning the values of the array to the driver array
-                //  System.out.println(championDrivers.get(i));
-            }
-        } catch (Exception e) {
-            System.out.println("Error occurred in stat update");
-          //  System.out.println(championDrivers.size());
-        }*/
-        //adding the stats to drivers according to their position
         if (championDrivers.size() < 10) {
 
         } else {
@@ -370,15 +338,10 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
                 championDrivers.get(7).addStats(0, 0, 0, 4, 1);
                 championDrivers.get(8).addStats(0, 0, 0, 2, 1);
                 championDrivers.get(9).addStats(0, 0, 0, 1, 1);
-                System.out.println("Stats updated");
 
                 for (int i = 0; i < championDrivers.size(); i++) {
                     if (i > 9) {
-                        championDrivers.get(i).addStats(0, 0, 0, 0, 1);
-                        System.out.println(championDrivers.get(i).getDriverName());
-                        //  System.out.println("hi");
-                        System.out.println(championDrivers.size());
-                        continue;
+                        championDrivers.get(i).addStats(0, 0, 0, 0, 1);//incrementing drivers races who are above 10
                     }
                 }
             } catch (IndexOutOfBoundsException e) {
@@ -395,8 +358,8 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
         if (championDrivers.isEmpty()) {
             System.out.println("No drivers to show in table");
         } else {
-            System.out.println(String.format("%20s %10s %20s %11s %20s %10s %20s  %9s %20s  %13s %20s  %10s %10s", "Driver name ", "|", "Driver Team ", "|", "Total points ", "|", "First positions", "|", "Second positions ", "|", "Third position ", "|", "Total races "));
-            System.out.println(String.format("%s", "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------"));
+            System.out.printf("%20s %10s %20s %11s %20s %10s %20s  %9s %20s  %13s %20s  %10s %10s%n", "Driver name ", "|", "Driver Team ", "|", "Total points ", "|", "First positions", "|", "Second positions ", "|", "Third position ", "|", "Total races ");
+            System.out.printf("%s%n", "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 
             for (Formula1Driver f1 : championDrivers) {
@@ -418,7 +381,6 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
         for (int i = 0; i < championDrivers.size(); i++) {
             driverObj.writeObject(championDrivers.get(i));
         }
-
 
         driverObj.close();
         output.close();
@@ -445,20 +407,24 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
     @Override
     public void Load() throws IOException {
         FileInputStream driverInput = new FileInputStream("DriverDetails.txt");
-        ObjectInputStream driverObj = new ObjectInputStream(driverInput);
-        while (true) {
-            try {
-                Formula1Driver f1 = (Formula1Driver) driverObj.readObject();
-
-                championDrivers.add(f1);
-
-                System.out.println(f1);
+        try {
+            ObjectInputStream driverObj = new ObjectInputStream(driverInput);
 
 
-            } catch (IOException | ClassNotFoundException e) {
-                break;
+            while (true) {
+                try {
+                    Formula1Driver f1 = (Formula1Driver) driverObj.readObject();
+
+                    championDrivers.add(f1);
+
+                } catch (IOException | ClassNotFoundException e) {
+
+                    break;
+                }
+
             }
-
+        } catch (IOException e) {
+            System.out.println("No data to load");
 
         }
 
@@ -474,19 +440,16 @@ public class Formula1ChampionshipManager implements ChampionshipManager {
 
                     races.add(r1);
 
-                    System.out.println(r1);
-
-
-                }  catch (IOException | ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
+                    System.out.println("error");
 
                     break;
                 }
 
-
             }
 
+        } catch (EOFException e) {
 
-        }catch (EOFException e) {
 
         }
     }
